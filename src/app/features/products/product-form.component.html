@@ -1,0 +1,148 @@
+<section class="form-page">
+  <header class="form-header">
+    <div>
+      <h1 class="page-title">Formulario de registro</h1>
+    </div>
+    <a routerLink="/" class="link-back">← Volver al listado</a>
+  </header>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()" class="product-form" novalidate>
+    <div class="form-grid">
+      <div class="form-field">
+        <label for="id">Id *</label>
+        <input
+          id="id"
+          type="text"
+          formControlName="id"
+          class="text-input"
+          [disabled]="isEditMode"
+          placeholder="Identificador único (3-10 caracteres)"
+        />
+        <div class="field-errors" *ngIf="form.get('id')?.touched">
+          <span *ngIf="hasControlError('id', 'required')">El Id es requerido.</span>
+          <span *ngIf="hasControlError('id', 'idLength')">
+            El Id debe tener entre 3 y 10 caracteres.
+          </span>
+          <span *ngIf="hasControlError('id', 'idTaken')">
+            Ya existe un producto con ese Id.
+          </span>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="name">Nombre *</label>
+        <input
+          id="name"
+          type="text"
+          formControlName="name"
+          class="text-input"
+          placeholder="Nombre del producto"
+        />
+        <div class="field-errors" *ngIf="form.get('name')?.touched">
+          <span *ngIf="hasControlError('name', 'required')">El nombre es requerido.</span>
+          <span *ngIf="hasControlError('name', 'minlength')">
+            El nombre debe tener al menos 5 caracteres.
+          </span>
+          <span *ngIf="hasControlError('name', 'maxlength')">
+            El nombre no debe superar los 100 caracteres.
+          </span>
+        </div>
+      </div>
+
+      <div class="form-field form-field-full">
+        <label for="description">Descripción *</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          rows="3"
+          class="text-area"
+          placeholder="Descripción del producto (10 a 200 caracteres)"
+        ></textarea>
+        <div class="field-errors" *ngIf="form.get('description')?.touched">
+          <span *ngIf="hasControlError('description', 'required')">La descripción es requerida.</span>
+          <span *ngIf="hasControlError('description', 'minlength')">
+            La descripción debe tener al menos 10 caracteres.
+          </span>
+          <span *ngIf="hasControlError('description', 'maxlength')">
+            La descripción no debe superar los 200 caracteres.
+          </span>
+        </div>
+      </div>
+
+      <div class="form-field form-field-full">
+        <label for="logo">Logo (URL) *</label>
+        <input
+          id="logo"
+          type="url"
+          formControlName="logo"
+          class="text-input"
+          placeholder="https://ejemplo.com/logo.png"
+        />
+        <div class="field-errors" *ngIf="form.get('logo')?.touched">
+          <span *ngIf="hasControlError('logo', 'required')">El logo es requerido.</span>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="date_release">Fecha de liberación *</label>
+        <input
+          id="date_release"
+          type="date"
+          formControlName="date_release"
+          class="text-input"
+          [attr.max]="today"
+        />
+        <div class="field-errors" *ngIf="form.get('date_release')?.touched">
+          <span *ngIf="hasControlError('date_release', 'required')">
+            La fecha de liberación es requerida.
+          </span>
+          <span *ngIf="hasControlError('date_release', 'releaseDateInFuture')">
+            La fecha de liberación debe ser menor o igual a hoy.
+          </span>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label for="date_revision">Fecha de revisión *</label>
+        <input
+          id="date_revision"
+          type="date"
+          formControlName="date_revision"
+          class="text-input"
+        />
+        <div class="field-errors" *ngIf="form.get('date_revision')?.touched || form.touched">
+          <span *ngIf="hasControlError('date_revision', 'required')">
+            La fecha de revisión es requerida.
+          </span>
+          <span *ngIf="hasFormError('reviewDateNotOneYearAfterRelease')">
+            La fecha de revisión debe ser exactamente un año posterior a la fecha de liberación.
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <section *ngIf="submitError" class="alert alert-error">
+      {{ submitError }}
+    </section>
+
+    <footer class="form-actions">
+      <button
+        type="button"
+        class="btn btn-secondary"
+        (click)="onReset()"
+        [disabled]="submitting"
+      >
+        Reiniciar
+      </button>
+
+      <button
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="submitting"
+      >
+        {{ isEditMode ? (submitting ? 'Guardando...' : 'Guardar cambios') : (submitting ? 'Agregando...' : 'Agregar') }}
+      </button>
+    </footer>
+  </form>
+</section>
+

@@ -5,12 +5,13 @@ let PORT = 3002;
 
 // creates express app, registers all controller routes and returns you express app instance
 const app = createExpressServer({
-  //cors: true,
-  routePrefix: "/bp", 
-
-  controllers: [
-    __dirname + "/controllers/*{.js,.ts}",
-  ], // we specify controllers we want to use
+  cors: {
+    origin: "http://localhost:4200",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  },
+  routePrefix: "/bp",
+  controllers: [__dirname + "/controllers/*{.js,.ts}"], // we specify controllers we want to use
 });
 
 // run express application on port 3000

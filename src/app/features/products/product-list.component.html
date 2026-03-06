@@ -1,0 +1,182 @@
+<section class="products-page">
+  <header class="products-header">
+    <div>
+      <h1 class="page-title">Productos financieros</h1>
+    </div>
+    <button type="button" class="btn btn-primary" (click)="navigateToCreate()">
+      Agregar
+    </button>
+  </header>
+
+  <section class="filters">
+    <label class="filter-item">
+      <input
+        type="text"
+        class="text-input"
+        placeholder="Search"
+        [value]="searchTerm()"
+        (input)="onSearchTermChange($any($event.target).value)"
+      />
+    </label>
+
+  </section>
+
+  <ng-template #loadingTpl>
+    <span>Cargando productos...</span>
+  </ng-template>
+
+  <section *ngIf="loadError() as error" class="alert alert-error">
+    {{ error }}
+  </section>
+
+  <section *ngIf="!loadError()">
+    <div class="table-wrapper" *ngIf="paginatedProducts().length > 0; else emptyStateTpl">
+      <table class="products-table">
+        <thead>
+          <tr>
+            <th>Logo</th>
+            <th>Id</th>
+            <th>Nombre</th>
+            <th>Descripción</th>
+            <th>Fecha liberación</th>
+            <th>Fecha revisión</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of paginatedProducts()">
+            <td>
+              <img [src]="product.logo" [alt]="product.name" class="product-logo" />
+            </td>
+            <td>{{ product.id }}</td>
+            <td>{{ product.name }}</td>
+            <td>{{ product.description }}</td>
+            <td>{{ product.date_release | date: 'yyyy-MM-dd' }}</td>
+            <td>{{ product.date_revision | date: 'yyyy-MM-dd' }}</td>
+            <td class="actions-cell">
+              <div class="actions-wrapper">
+                <button
+                  type="button"
+                  class="icon-button"
+                  (click)="toggleMenu(product.id)"
+                >
+                  ⋮
+                </button>
+                <div
+                  class="context-menu"
+                  *ngIf="openMenuForId() === product.id"
+                >
+                  <button
+                    type="button"
+                    class="context-menu-item"
+                    (click)="navigateToEdit(product)"
+                  >
+                    Editar
+                  </button>
+                  <button
+                    type="button"
+                    class="context-menu-item context-menu-item-danger"
+                    (click)="openDeleteDialog(product)"
+                  >
+                    Eliminar
+                  </button>
+                </div>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <ng-template #emptyStateTpl>
+      <p class="empty-state">No se encontraron productos para los filtros seleccionados.</p>
+    </ng-template>
+
+    <footer class="pagination">
+      <div class="pagination-info">
+        <div class="results-count">
+          Resultados: <strong>{{ totalResults() }}</strong>
+        </div>
+        <div class="page-indicator">
+          Página {{ currentPage() }} de {{ totalPages() }}
+        </div>
+      </div>
+      <div class="pagination-right">
+        <label class="page-size">
+          Items por página
+          <select class="select-input" [value]="pageSize()" (change)="onPageSizeChange($any($event.target).value)">
+            <option *ngFor="let size of pageSizeOptions" [value]="size">
+              {{ size }}
+            </option>
+          </select>
+        </label>
+        <div class="pagination-controls">
+          <button type="button" class="btn btn-secondary" (click)="goToFirstPage()" [disabled]="currentPage() === 1">
+            « Primero
+          </button>
+          <button type="button" class="btn btn-secondary" (click)="goToPreviousPage()" [disabled]="currentPage() === 1">
+            ‹ Anterior
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="goToNextPage()"
+            [disabled]="currentPage() === totalPages() || totalResults() === 0"
+          >
+            Siguiente ›
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="goToLastPage()"
+            [disabled]="currentPage() === totalPages() || totalResults() === 0"
+          >
+            Último »
+          </button>
+        </div>
+      </div>
+    </footer>
+  </section>
+
+  <section
+    class="modal-backdrop"
+    *ngIf="deleteDialogOpen()"
+  >
+    <div class="modal">
+      <header class="modal-header">
+        <h2>Eliminar producto</h2>
+      </header>
+      <div class="modal-body">
+        <p>
+          ¿Estás seguro de que deseas eliminar el producto
+          <strong>{{ productPendingDelete()?.name }}</strong>?
+        </p>
+        <p class="modal-warning">
+          Esta acción no se puede deshacer.
+        </p>
+        <p *ngIf="deleteError()" class="modal-error">
+          {{ deleteError() }}
+        </p>
+      </div>
+      <footer class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeDeleteDialog()"
+          [disabled]="deleting()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-danger"
+          (click)="confirmDelete()"
+          [disabled]="deleting()"
+        >
+          {{ deleting() ? 'Eliminando...' : 'Eliminar' }}
+        </button>
+      </footer>
+    </div>
+  </section>
+</section>
+
